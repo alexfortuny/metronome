@@ -1,9 +1,10 @@
-let audioContext = new AudioContext();
-let tempo = 120.0;
 const noteLength = 0.05;
 const lookAheadTime = 0.1;
+let audioContext = new AudioContext();
+let tempo = 30.0;
 let playing = false;
 let nextBeatTime = 0;
+let playMetronome = null;
 /* Not needed for now, maybe in the future
 
 var buffer = audioContext.createBuffer(1, 1, 22050);
@@ -20,30 +21,30 @@ playButton.addEventListener("click", () => {
     
     //On
     if(playing){
-        nextBeatTime = audioContext.currentTime;
-        let i=0;
-        while (i<1000){
-            scheduleBeat();
-            setNextBeat();
-            i++;
-        }
+        nextBeatTime = audioContext.currentTime + 0.1;
+        playMetronome = setInterval(scheduleBeat, 60.0/tempo*1000);
+        console.log("Debug"); 
+    } else{
+        clearInterval(playMetronome);
+        playMetronome = null;
     }
 
 
 }); 
 
 function scheduleBeat(){
-    
     const osc = audioContext.createOscillator();
-    osc.connect( audioContext.destination );
+    osc.connect(audioContext.destination);
     osc.frequency.value = 880.0;
     osc.start(nextBeatTime);
     osc.stop(nextBeatTime+noteLength);
+    setNextBeat();
 }
 
 function setNextBeat(){
     nextBeatTime += 60/tempo;
 }
+
 
 const submitTempoBtn = document.getElementById("submitTempo");
 submitTempoBtn.addEventListener("click", () => {
